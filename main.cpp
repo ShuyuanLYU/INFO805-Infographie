@@ -3,26 +3,57 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include "Viewer.h"
+#include "Viewer.cpp"
      
 using namespace std;
 
 int main(int argc, char** argv)
 {
-  // Read command lines arguments.
-  QApplication application(argc,argv);
+    TriangleSoup triangleSoup;
+    Viewer viewer;
 
-  // Instantiate the viewer.
-  Viewer viewer;
+    /* ---- Deuxième partie ---- */
 
-  // Give a name
-  viewer.setWindowTitle("Viewer triangle soup");
+    ifstream input( argv[1] );
 
-  // Make the viewer window visible on screen.
-  viewer.show();
+    try 
+    {
+        triangleSoup.read( input );
+    }
+    catch ( char const * msg ) 
+    {
+        std::cerr << "Exception: " << msg << std::endl;
+    }
+    catch (...) 
+    {
+        std::cerr << "Exception." << std::endl;
+    }
+    input.close();
 
-  // Run main loop.
-  application.exec();
-  
-  return 0;
+    QApplication application(argc, argv);
+
+    viewer.ptrSoup = &triangleSoup;
+    viewer.setWindowTitle("Viewer triangle soup");
+    viewer.show();
+    application.exec();
+
+
+    /* ---- Premiere partie ---- */
+
+    // // Read command lines arguments.
+    // QApplication application(argc, argv);
+
+    // // Instantiate the viewer.
+    // Viewer viewer;
+
+    // // Give a name
+    // viewer.setWindowTitle("Viewer triangle soup");
+
+    // // Make the viewer window visible on screen.
+    // viewer.show();
+
+    // // Run main loop.
+    // application.exec();
+    
+    return 0;
 }

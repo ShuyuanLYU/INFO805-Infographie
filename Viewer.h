@@ -1,12 +1,15 @@
 #include <vector>
 #include <QGLViewer/qglviewer.h>
+#include "Utils.cpp"
 
 class Viewer : public QGLViewer
 {
     public:
-    Viewer() : QGLViewer() {}
+    const TriangleSoup* ptrSoup;
+
+    Viewer( const TriangleSoup* aSoup = 0 ) : QGLViewer(), ptrSoup( aSoup ) {}
   
-    protected :
+    protected:
     /// Called at each draw of the window
     virtual void draw();
     
