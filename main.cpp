@@ -10,7 +10,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
     TriangleSoup triangleSoup;
-    Viewer viewer;
+    
 
     /* ---- Deuxième partie ---- */
 
@@ -32,7 +32,8 @@ int main(int argc, char** argv)
 
     QApplication application(argc, argv);
 
-    viewer.ptrSoup = &triangleSoup;
+    Viewer viewer(&triangleSoup);
+ 
     viewer.setWindowTitle("Viewer triangle soup");
     viewer.show();
     application.exec();

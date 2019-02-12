@@ -50,10 +50,8 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = Viewer.cpp \
-		main.cpp 
-OBJECTS       = Viewer.o \
-		main.o
+SOURCES       = main.cpp 
+OBJECTS       = main.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -127,8 +125,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		viewer.pro Viewer.h Viewer.cpp \
-		main.cpp
+		viewer.pro Viewer.h main.cpp
 QMAKE_TARGET  = viewer
 DESTDIR       = 
 TARGET        = viewer
@@ -317,7 +314,7 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents Viewer.h $(DISTDIR)/
-	$(COPY_FILE) --parents Viewer.cpp main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -365,20 +362,8 @@ compiler_clean: compiler_moc_predefs_clean
 
 ####### Compile
 
-Viewer.o: Viewer.cpp Viewer.h \
-		../libQGLViewer-2.7.1/QGLViewer/qglviewer.h \
-		../libQGLViewer-2.7.1/QGLViewer/camera.h \
-		../libQGLViewer-2.7.1/QGLViewer/keyFrameInterpolator.h \
-		../libQGLViewer-2.7.1/QGLViewer/quaternion.h \
-		../libQGLViewer-2.7.1/QGLViewer/vec.h \
-		../libQGLViewer-2.7.1/QGLViewer/config.h \
-		../libQGLViewer-2.7.1/QGLViewer/frame.h \
-		../libQGLViewer-2.7.1/QGLViewer/constraint.h \
-		Utils.cpp \
-		Utils.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Viewer.o Viewer.cpp
-
-main.o: main.cpp Viewer.h \
+main.o: main.cpp Viewer.cpp \
+		Viewer.h \
 		../libQGLViewer-2.7.1/QGLViewer/qglviewer.h \
 		../libQGLViewer-2.7.1/QGLViewer/camera.h \
 		../libQGLViewer-2.7.1/QGLViewer/keyFrameInterpolator.h \
