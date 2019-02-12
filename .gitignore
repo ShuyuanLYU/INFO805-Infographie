@@ -36,3 +36,8 @@
 .vscode
 viewer
 .q*
+
+ig*
+tp-ig*
+.DS_Store
+Viewer.pro.user
