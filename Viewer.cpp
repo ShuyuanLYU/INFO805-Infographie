@@ -6,14 +6,24 @@ using namespace std;
 void Viewer::draw()
 {
     const float nbSteps = 200.0;
-    float colorBronzeDiff[4]    = { 0.8, 0.6, 0.0, 1.0 };
+    float colorBronzeDiff[4] = { 0.8, 0.6, 0.0, 1.0 };
+    float colorBronzeSpec[4] = { 1.0, 1.0, 0.4, 1.0 };
+    float colorNull      [4] = { 0.0, 0.0, 0.0, 1.0 };
 
     // Draws triangles given by 3 vertices.
     glBegin(GL_TRIANGLES);
 
     glColor4fv(colorBronzeDiff);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, colorBronzeDiff);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, colorBronzeSpec);
+    glMaterialf(GL_FRONT, GL_SHININESS, 20.0f );
 
-    for(vector<Triangle>::const_iterator it = ptrSoup->triangles.begin(); it != ptrSoup->triangles.end(); ++it) {
+    for(vector<Triangle>::const_iterator it = ptrSoup->triangles.begin(); it != ptrSoup->triangles.end(); ++it) 
+    {
+        const Triangle& t = *it;
+        Vecteur n = t.normal();
+        glNormal3f( n[ 0 ], n[ 1 ], n[ 2 ] );
+
         glVertex3f( (*it)[0][0], (*it)[0][1], (*it)[0][2] );
         glVertex3f( (*it)[1][0], (*it)[1][1], (*it)[1][2] );
         glVertex3f( (*it)[2][0], (*it)[2][1], (*it)[2][2] );
@@ -26,9 +36,18 @@ void Viewer::init()
 {
     // Restore previous viewer state.
     restoreStateFromFile();
+
+    Vecteur low = ptrSoup -> triangles[0][0];
+    Vecteur up  = ptrSoup -> triangles[0][0];
+
+    ptrSoup -> boundingBox(low, up);
+
+    camera() -> setSceneBoundingBox(qglviewer::Vec(low[0], low[1], low[2]), qglviewer::Vec(up[0], up[1], up[2]));
+
+    camera() -> showEntireScene();
     
     // Opens help window
-    help();
+    //help();
 }
 
 QString Viewer::helpString() const

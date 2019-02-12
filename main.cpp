@@ -9,10 +9,9 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    TriangleSoup triangleSoup;
-    
-
     /* ---- Deuxième partie ---- */
+
+    TriangleSoup triangleSoup;
 
     ifstream input( argv[1] );
 

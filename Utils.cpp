@@ -24,7 +24,26 @@ float Vecteur::operator[]( int i ) const
 float& Vecteur::operator[]( int i )
 {
     return xyz[i];
-}  
+}
+
+Vecteur Vecteur::inf( const Vecteur& other ) const 
+{
+    return ((xyz[0] + xyz[1] + xyz[2]) < (other[0] + other[1] + other[2])) ? Vecteur(xyz[0], xyz[1], xyz[2]) : other;
+}
+
+Vecteur Vecteur::sup( const Vecteur& other ) const
+{
+    return ((xyz[0] + xyz[1] + xyz[2]) > (other[0] + other[1] + other[2])) ? Vecteur(xyz[0], xyz[1], xyz[2]) : other;
+}
+
+Vecteur Vecteur::cross( const Vecteur& v ) const
+{
+    
+
+    return Vecteur((xyz[1] * v[2]) - (xyz[2] * v[1]), 
+                  (xyz[2] * v[0]) - (xyz[0] * v[2]), 
+                  (xyz[0] * v[1]) - (xyz[1] * v[0]));
+}
 
 Vecteur Triangle::operator[]( int i ) const
 {
@@ -58,6 +77,18 @@ Vecteur& Triangle::operator[]( int i )
     }
 }
 
+Vecteur Triangle::normal() const
+{
+    Vecteur normal = vX.cross(vY);
+    float somme = abs(normal[0]) + abs(normal[1]) + abs(normal[2]);
+
+    normal[0] = normal[0] / somme;
+    normal[1] = normal[1] / somme;
+    normal[2] = normal[2] / somme;
+
+    return normal;
+}
+
 void TriangleSoup::read(std::istream& in) 
 {
     std::string line;
@@ -77,4 +108,16 @@ void TriangleSoup::read(std::istream& in)
             triangles.push_back(triangle);
         }
     }   
+}
+
+void TriangleSoup::boundingBox( Vecteur& low, Vecteur& up) const
+{
+    for(vector<Triangle>::const_iterator it = triangles.begin(); it != triangles.end(); ++it) 
+    {
+        for(int i = 0; i < 3; ++i)
+        {
+            low = (*it)[i].inf(low);
+            up = (*it)[i] .sup(up);
+        }
+    }
 }
