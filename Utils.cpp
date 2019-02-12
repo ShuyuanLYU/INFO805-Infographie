@@ -38,8 +38,6 @@ Vecteur Vecteur::sup( const Vecteur& other ) const
 
 Vecteur Vecteur::cross( const Vecteur& v ) const
 {
-    
-
     return Vecteur((xyz[1] * v[2]) - (xyz[2] * v[1]), 
                   (xyz[2] * v[0]) - (xyz[0] * v[2]), 
                   (xyz[0] * v[1]) - (xyz[1] * v[0]));
@@ -79,7 +77,10 @@ Vecteur& Triangle::operator[]( int i )
 
 Vecteur Triangle::normal() const
 {
-    Vecteur normal = vX.cross(vY);
+    Vecteur vA(vY[0] - vX[0], vY[1] - vX[1], vY[2] - vX[2]);
+    Vecteur vB(vZ[0] - vX[0], vZ[1] - vX[1], vZ[2] - vX[2]);
+
+    Vecteur normal = vA.cross(vB);
     float somme = abs(normal[0]) + abs(normal[1]) + abs(normal[2]);
 
     normal[0] = normal[0] / somme;
