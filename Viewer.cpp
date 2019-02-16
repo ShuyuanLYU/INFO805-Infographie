@@ -13,7 +13,6 @@ void Viewer::draw()
     // Draws triangles given by 3 vertices.
     glBegin(GL_TRIANGLES);
 
-    glColor4fv(colorBronzeDiff);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, colorBronzeDiff);
     glMaterialfv(GL_FRONT, GL_SPECULAR, colorBronzeSpec);
     glMaterialf(GL_FRONT, GL_SHININESS, 20.0f );
@@ -21,8 +20,13 @@ void Viewer::draw()
     for(vector<Triangle>::const_iterator it = ptrSoup->triangles.begin(); it != ptrSoup->triangles.end(); ++it) 
     {
         const Triangle& t = *it;
+
+        float triangleColor[4] = { getDecimalPart((*it)[0][0]), getDecimalPart((*it)[1][2]), getDecimalPart((*it)[2][2]), 1.0 };
+
         Vecteur n = t.normal();
         glNormal3f( n[ 0 ], n[ 1 ], n[ 2 ] );
+
+        glColor4fv(triangleColor);
 
         glVertex3f( (*it)[0][0], (*it)[0][1], (*it)[0][2] );
         glVertex3f( (*it)[1][0], (*it)[1][1], (*it)[1][2] );
