@@ -25,6 +25,10 @@ class Vecteur
     Vecteur sup(const Vecteur &other) const;
 
     Vecteur cross(const Vecteur &v) const;
+
+    void operator+=(const Vecteur v);
+
+    void operator/=(const int divider);
 };
 
 class Triangle
@@ -94,21 +98,37 @@ struct Index
     }
 };
 
+// Structure pour calculer le barycentre d'un ensemble de points.
+struct CellData {
+    std::vector<Vecteur> acc;
+
+    // Crée un accumulateur vide.
+    CellData() : acc() {};
+
+    // Ajoute le point v à l'accumulateur.
+    void add( const Vecteur& v );
+    
+    // Retourne le barycentre de tous les points ajoutés.
+    Vecteur barycenter() const;
+};
+
 struct TriangleSoupZipper
 {
     // Définir chaque x - y - z le plus haut et le plus bas indépendemment. Puis diviser par l'index x - y - z;
     TriangleSoup input;
-    TriangleSoup output;
-    Index index;
-    float inputBoxSizeX;
-    float inputBoxSizeY;
-    float inputBoxSizeZ;
+    TriangleSoup* output;
+    Index size;
+    Vecteur lowerBound;
+    Vecteur upperBound;
+
+    // Stocke pour chaque cellule son barycentre.
+    // std::map<Index, CellData> index2data;
 
     // Construit le zipper avec une soupe de triangle en entrée \a
     // anInput, une soupe de triangle en sortie \a anOutput, et un index \a size
     // qui est le nombre de cellules de la boîte découpée selon les 3 directions.
     TriangleSoupZipper(const TriangleSoup &anInput,
-                       TriangleSoup &anOuput,
+                       TriangleSoup &anOutput,
                        Index size);
 
     /// @return l'index de la cellule dans laquelle tombe \a p.
@@ -116,6 +136,17 @@ struct TriangleSoupZipper
 
     /// @return le centroïde de la cellule d'index \a idx (son "centre").
     Vecteur centroid(const Index &idx) const;
+
+    /// @return the index of a coord
+    int getIndexOfCoord(const Vecteur& v, const int& index) const;
+
+    /// @return the center of a coord
+    float getCenterOfCoord(const Index& idx, const int& i) const;
+
+    /// zips the output
+    void zip();
+
+    // void smartZip();
 };
 
 std::ostream &operator<<(std::ostream &out, Vecteur v)
@@ -136,5 +167,3 @@ float getDecimalPart(const float &coord)
 {
     return coord - floor(coord);
 }
-
-float getTheSmallest
