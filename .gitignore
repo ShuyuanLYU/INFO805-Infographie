@@ -44,3 +44,10 @@ Viewer.pro.user
 
 fichiers
 Makefile
+
+#-----
+# TP2
+
+*.ppm
+Images
+ray-tracer
