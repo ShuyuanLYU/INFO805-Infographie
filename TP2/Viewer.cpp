@@ -35,7 +35,7 @@ void rt::Viewer::init()
 	setKeyDescription(Qt::SHIFT + Qt::Key_D, "Decreases the max depth of ray-tracing algorithm");
 
 	// Opens help window
-	help();
+	//help();
 
 	// To move lights around
 	setMouseTracking(true);

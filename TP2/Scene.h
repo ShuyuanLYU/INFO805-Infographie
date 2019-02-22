@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <vector>
+#include <limits>
 #include "GraphicalObject.h"
 #include "Light.h"
 
@@ -84,18 +85,20 @@ struct Scene
     rayIntersection(const Ray &ray,
                     GraphicalObject *&object, Point3 &p)
     {
-        Point3 pDeBase;
-        myObjects[0] -> rayIntersection(ray, pDeBase);
-        float distance = distance2(pDeBase, ray.origin);
+        float distance = std::numeric_limits<float>::max();
+
         for (std::vector<GraphicalObject *>::const_iterator it = myObjects.begin(); it < myObjects.end(); ++it)
         {
             Point3 newP;
-            (*it)->rayIntersection(ray, newP);
-            // qp . w
-            if (distance2(newP, ray.origin) < distance)
-            {
-                p = newP;
-                object = *it;
+
+            if((*it) -> rayIntersection(ray, newP) < 0.0f) {
+                float newDistance = (newP - ray.origin).dot(ray.direction);
+                if (newDistance < distance)
+                {
+                    distance = newDistance;
+                    p = newP;
+                    object = *it;
+                }
             }
         }
         if (object == NULL)
@@ -104,9 +107,7 @@ struct Scene
             return 1.0f;
         }
         else
-        {
             return -1.0f;
-        }
     }
 
   private:

@@ -93,19 +93,21 @@ rt::Sphere::rayIntersection(const Ray &ray, Point3 &p)
   // calculez la distance au carré entre c et la droite contenant le rayon [o,u)
   Vector3 origineCenter = center - ray.origin;
   Vector3 origineOrtho = origineCenter.dot(ray.direction) * ray.direction;
+
   float distance = distance2(origineCenter, origineOrtho);
-  // si cette distance au carré est plus grande que r^2, alors il n'y pas d'intersection et on retourne un nombre positif.
+  
   if (distance > radius * radius)
     return 1.0f;
   else
   {
     // delta = b^2 - 4ac
     Vector3 centerOrigin = ray.origin - center;
+
     float discriminant = 4 * (ray.direction.dot(centerOrigin)) * (ray.direction.dot(centerOrigin)) - 4 * (centerOrigin.dot(centerOrigin) - radius * radius);
+
     float t1 = (-2 * ray.direction.dot(centerOrigin) - sqrt(discriminant)) / 2;
     float t2 = (-2 * ray.direction.dot(centerOrigin) + sqrt(discriminant)) / 2;
-    // Point3 point1 = ray.origine + t1 * ray.direction;
-    // Point3 point2 = ray.origine + t2 * ray.direction;
+    
     if (t1 > 0)
     {
       p = ray.origin + t1 * ray.direction;
