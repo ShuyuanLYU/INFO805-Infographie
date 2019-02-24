@@ -141,23 +141,51 @@ struct Renderer
     /// Calcule l'illumination de l'objet \a obj au point \a p, sachant que l'observateur est le rayon \a ray.
     Color illumination(const Ray &ray, GraphicalObject *obj, Point3 p)
     {
+        Vector3 normal = obj -> getNormal(p);
+        
         Material material = obj -> getMaterial(p);
-
         Color result(0, 0, 0);
+
+        Vector3 mirror = reflect(ray.direction, normal);
 
         for (std::vector<Light *>::const_iterator it = ptrScene -> myLights.begin(); it < ptrScene -> myLights.end(); ++it)
         {
-            double coefficient = (*it) -> direction(ray.origin).dot(obj -> getNormal(p));
+            Vector3 lightDirection = (*it) -> direction(ray.origin);
+            Color lightColor = (*it) -> color(ray.origin);
 
-            if(coefficient < 0)
-                coefficient = 0.0;
+            // Couleur diffuse
+            double coeffD = lightDirection.dot(normal);
+
+            if(coeffD < 0)
+                coeffD = 0.0;
             
-            coefficient = sin(coefficient);
+            coeffD = sin(coeffD);
 
-            result += coefficient * material.diffuse * (*it) -> color(ray.origin);
+            result += coeffD * material.diffuse * lightColor;
+
+            /**
+             * Shininess ne prend pas de y car pour transformer
+             * un adjectif finissant par y en nom (adj + ness)
+             * il faut transformer le y en i !
+             * Exemple : happy -> happiness.
+             **/
+            double sine = tan(mirror.dot(lightDirection));
+
+            if(sine >= 0)
+            {
+                double coeffS = pow(sine, material.shinyness);
+
+                result += lightColor * material.specular * coeffS;
+            }
         }
 
         return result + material.ambient;
+    }
+
+    /// Calcule le vecteur réfléchi à W selon la normale N.
+    Vector3 reflect( const Vector3& W, const Vector3& N ) const
+    {
+        return W - 2 * (W.dot(N)) * N;
     }
 };
 
