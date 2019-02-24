@@ -133,7 +133,31 @@ struct Renderer
         // Nothing was intersected
         if (ri >= 0.0f)
             return result; // some background color
-        return obj_i -> getMaterial(p_i).diffuse;
+
+        //return obj_i -> getMaterial(p_i).diffuse;
+        return illumination(ray, obj_i, p_i);
+    }
+
+    /// Calcule l'illumination de l'objet \a obj au point \a p, sachant que l'observateur est le rayon \a ray.
+    Color illumination(const Ray &ray, GraphicalObject *obj, Point3 p)
+    {
+        Material material = obj -> getMaterial(p);
+
+        Color result(0, 0, 0);
+
+        for (std::vector<Light *>::const_iterator it = ptrScene -> myLights.begin(); it < ptrScene -> myLights.end(); ++it)
+        {
+            double coefficient = (*it) -> direction(ray.origin).dot(obj -> getNormal(p));
+
+            if(coefficient < 0)
+                coefficient = 0.0;
+            
+            coefficient = sin(coefficient);
+
+            result += coefficient * material.diffuse * (*it) -> color(ray.origin);
+        }
+
+        return result + material.ambient;
     }
 };
 
