@@ -163,22 +163,24 @@ struct Renderer
 
             result += coeffD * material.diffuse * lightColor;
 
+            // Couleur spéculaire
             /**
              * Shininess ne prend pas de y car pour transformer
              * un adjectif finissant par y en nom (adj + ness)
              * il faut transformer le y en i !
              * Exemple : happy -> happiness.
              **/
-            double sine = tan(mirror.dot(lightDirection));
+            double angle = tan(mirror.dot(lightDirection));
 
-            if(sine >= 0)
+            if(angle >= 0)
             {
-                double coeffS = pow(sine, material.shinyness);
+                double coeffS = pow(angle, material.shinyness);
 
                 result += lightColor * material.specular * coeffS;
             }
         }
 
+        // Couleur ambiante
         return result + material.ambient;
     }
 
