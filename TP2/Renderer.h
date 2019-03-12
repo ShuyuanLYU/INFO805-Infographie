@@ -165,18 +165,17 @@ struct Renderer
 
             // Couleur spéculaire
             /**
-             * Shininess ne prend pas de y car pour transformer
-             * un adjectif finissant par y en nom (adj + ness)
-             * il faut transformer le y en i !
+             * Shininess ne prend pas de 'y' car pour transformer
+             * un adjectif finissant par 'y' en nom (adj + ness)
+             * il faut transformer le 'y' en 'i' !
              * Exemple : happy -> happiness.
              **/
-            double angle = tan(mirror.dot(lightDirection));
-
+            double angle = mirror.dot(lightDirection) / (lightDirection.norm() * mirror.norm());
             if(angle >= 0)
             {
                 double coeffS = pow(angle, material.shinyness);
 
-                result += lightColor * material.specular * coeffS;
+                result += coeffS * material.specular * lightColor;
             }
         }
 
