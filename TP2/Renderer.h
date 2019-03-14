@@ -13,6 +13,46 @@
 /// Namespace RayTracer
 namespace rt
 {
+struct Background
+{
+    virtual Color backgroundColor(const Ray &ray) = 0;
+};
+
+struct MyBackground : public Background
+{
+    //     Color backgroundColor(const Ray &ray)
+    //     {
+    //         if (ray.direction[2] > 0 && ray.direction[2] < 0)
+    //             return ray.direction[2] * Color(0.0, 0.0, 1.0) + (1 - ray.direction[2]) * Color(1.0, 1.0, 1.0);
+    //         else
+    //         {
+    //             return Color(0.0, 0.0, 0.0);
+    //         }
+    //     }
+
+    Color backgroundColor(const Ray &ray)
+    {
+        if (ray.direction[2] < 0.0)
+        {
+            Color result(0.0f, 0.0f, 0.0f);
+
+            Real x = -0.5f * ray.direction[0] / ray.direction[2];
+            Real y = -0.5f * ray.direction[1] / ray.direction[2];
+            Real d = sqrt(x * x + y * y);
+            Real t = std::min(d, 30.0f) / 30.0f;
+            x -= floor(x);
+            y -= floor(y);
+            if (((x >= 0.5f) && (y >= 0.5f)) || ((x < 0.5f) && (y < 0.5f)))
+                result += (1.0f - t) * Color(0.2f, 0.2f, 0.2f) + t * Color(1.0f, 1.0f, 1.0f);
+            else
+                result += (1.0f - t) * Color(0.4f, 0.4f, 0.4f) + t * Color(1.0f, 1.0f, 1.0f);
+
+            return result;
+        }
+        else
+            return ray.direction[2] * Color(0.0, 0.0, 1.0) + (1 - ray.direction[2]) * Color(1.0, 1.0, 1.0);
+    }
+};
 
 inline void progressBar(std::ostream &output,
                         const double currentValue, const double maximumValue)
@@ -74,8 +114,16 @@ struct Renderer
     int myWidth;
     int myHeight;
 
-    Renderer() : ptrScene(0) {}
-    Renderer(Scene &scene) : ptrScene(&scene) {}
+    Background *ptrBackground;
+
+    Renderer() : ptrScene(0)
+    {
+        ptrBackground = new MyBackground();
+    }
+    Renderer(Scene &scene) : ptrScene(&scene)
+    {
+        ptrBackground = new MyBackground();
+    }
     void setScene(rt::Scene &aScene) { ptrScene = &aScene; }
 
     void setViewBox(Point3 origin,
@@ -124,7 +172,7 @@ struct Renderer
     Color trace(const Ray &ray)
     {
         assert(ptrScene != 0);
-        Color result = Color(0.0, 0.0, 0.0);
+
         GraphicalObject *obj_i = 0; // pointer to intersected object
         Point3 p_i;                 // point of intersection
 
@@ -132,7 +180,7 @@ struct Renderer
         Real ri = ptrScene->rayIntersection(ray, obj_i, p_i);
         // Nothing was intersected
         if (ri >= 0.0f)
-            return result; // some background color
+            return background(ray); // some background color
 
         //return obj_i -> getMaterial(p_i).diffuse;
         return illumination(ray, obj_i, p_i);
@@ -141,25 +189,23 @@ struct Renderer
     /// Calcule l'illumination de l'objet \a obj au point \a p, sachant que l'observateur est le rayon \a ray.
     Color illumination(const Ray &ray, GraphicalObject *obj, Point3 p)
     {
-        Vector3 normal = obj -> getNormal(p);
-        
-        Material material = obj -> getMaterial(p);
+        Vector3 normal = obj->getNormal(p);
+
+        Material material = obj->getMaterial(p);
         Color result(0, 0, 0);
 
         Vector3 mirror = reflect(ray.direction, normal);
 
-        for (std::vector<Light *>::const_iterator it = ptrScene -> myLights.begin(); it < ptrScene -> myLights.end(); ++it)
+        for (std::vector<Light *>::const_iterator it = ptrScene->myLights.begin(); it < ptrScene->myLights.end(); ++it)
         {
-            Vector3 lightDirection = (*it) -> direction(ray.origin);
-            Color lightColor = (*it) -> color(ray.origin);
+            Vector3 lightDirection = (*it)->direction(ray.origin);
+            Color lightColor = (*it)->color(ray.origin);
 
             // Couleur diffuse
-            double coeffD = lightDirection.dot(normal);
+            double coeffD = lightDirection.dot(normal) / (lightDirection.norm() * normal.norm());
 
-            if(coeffD < 0)
+            if (coeffD < 0)
                 coeffD = 0.0;
-            
-            coeffD = sin(coeffD);
 
             result += coeffD * material.diffuse * lightColor;
 
@@ -171,7 +217,8 @@ struct Renderer
              * Exemple : happy -> happiness.
              **/
             double angle = mirror.dot(lightDirection) / (lightDirection.norm() * mirror.norm());
-            if(angle >= 0)
+
+            if (angle >= 0)
             {
                 double coeffS = pow(angle, material.shinyness);
 
@@ -184,9 +231,29 @@ struct Renderer
     }
 
     /// Calcule le vecteur réfléchi à W selon la normale N.
-    Vector3 reflect( const Vector3& W, const Vector3& N ) const
+    Vector3 reflect(const Vector3 &W, const Vector3 &N) const
     {
         return W - 2 * (W.dot(N)) * N;
+    }
+
+    // Affiche les sources de lumières avant d'appeler la fonction qui
+    // donne la couleur de fond.
+    Color background(const Ray &ray)
+    {
+        Color result = Color(0.0, 0.0, 0.0);
+        for (Light *light : ptrScene->myLights)
+        {
+            Real cos_a = light->direction(ray.origin).dot(ray.direction);
+            if (cos_a > 0.99f)
+            {
+                Real a = acos(cos_a) * 360.0 / M_PI / 8.0;
+                a = std::max(1.0f - a, 0.0f);
+                result += light->color(ray.origin) * a * a;
+            }
+        }
+        if (ptrBackground != 0)
+            result += ptrBackground->backgroundColor(ray);
+        return result;
     }
 };
 
