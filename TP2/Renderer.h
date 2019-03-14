@@ -20,16 +20,6 @@ struct Background
 
 struct MyBackground : public Background
 {
-    //     Color backgroundColor(const Ray &ray)
-    //     {
-    //         if (ray.direction[2] > 0 && ray.direction[2] < 0)
-    //             return ray.direction[2] * Color(0.0, 0.0, 1.0) + (1 - ray.direction[2]) * Color(1.0, 1.0, 1.0);
-    //         else
-    //         {
-    //             return Color(0.0, 0.0, 0.0);
-    //         }
-    //     }
-
     Color backgroundColor(const Ray &ray)
     {
         if (ray.direction[2] < 0.0)
@@ -182,7 +172,6 @@ struct Renderer
         if (ri >= 0.0f)
             return background(ray); // some background color
 
-        //return obj_i -> getMaterial(p_i).diffuse;
         return illumination(ray, obj_i, p_i);
     }
 
@@ -198,8 +187,11 @@ struct Renderer
 
         for (std::vector<Light *>::const_iterator it = ptrScene->myLights.begin(); it < ptrScene->myLights.end(); ++it)
         {
-            Vector3 lightDirection = (*it)->direction(ray.origin);
-            Color lightColor = (*it)->color(ray.origin);
+            Vector3 lightDirection = (*it)->direction(p);
+            Color lightColor = (*it)->color(p);
+
+            Ray pointToLightRay = Ray(p, lightDirection);
+            Color shadow = this->shadow(pointToLightRay, lightColor);
 
             // Couleur diffuse
             double coeffD = lightDirection.dot(normal) / (lightDirection.norm() * normal.norm());
@@ -224,6 +216,8 @@ struct Renderer
 
                 result += coeffS * material.specular * lightColor;
             }
+
+            result = result * shadow;
         }
 
         // Couleur ambiante
@@ -254,6 +248,37 @@ struct Renderer
         if (ptrBackground != 0)
             result += ptrBackground->backgroundColor(ray);
         return result;
+    }
+
+    /// Calcule la couleur de la lumière (donnée par lightColor) dans la
+    /// direction donnée par le rayon. Si aucun objet n'est traversé,
+    /// retourne lightColor, sinon si un des objets traversés est opaque,
+    /// retourne du noir, et enfin si les objets traversés sont
+    /// transparents, attenue la couleur.
+    Color shadow(const Ray &ray, Color lightColor)
+    {
+        Point3 rayOrigin = ray.origin;
+
+        while(lightColor.max() > 0.003f)
+        {
+            rayOrigin += ray.direction + 0.001f;
+
+            GraphicalObject *intersectedObj = 0;
+            Point3 pointOfIntersection;
+
+            if(ptrScene->rayIntersection(Ray(rayOrigin, ray.direction, ray.depth), intersectedObj, pointOfIntersection) >= 0.0f )
+                break;
+            else
+            {
+                Material material = intersectedObj->getMaterial(pointOfIntersection);
+
+                lightColor = lightColor * material.diffuse * material.coef_refraction;
+
+                rayOrigin = pointOfIntersection;
+            }
+        }
+
+        return lightColor;
     }
 };
 
