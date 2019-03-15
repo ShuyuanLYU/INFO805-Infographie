@@ -168,11 +168,26 @@ struct Renderer
 
         // Look for intersection in this direction.
         Real ri = ptrScene->rayIntersection(ray, obj_i, p_i);
+
         // Nothing was intersected
         if (ri >= 0.0f)
             return background(ray); // some background color
 
-        return illumination(ray, obj_i, p_i);
+        Color color(0.0, 0.0, 0.0);
+
+        Material material = obj_i->getMaterial(p_i);
+
+        if (ray.depth > 0 && material.coef_reflexion != 0)
+        {
+            Vector3 rayReflect = reflect(ray.direction, obj_i->getNormal(p_i));
+            Ray ray_refl = Ray(p_i + rayReflect * 0.001f, rayReflect, ray.depth - 1);
+
+            Color color_refl = trace(ray_refl);
+
+            color += color_refl * material.specular * material.coef_reflexion;
+        }
+
+        return color + illumination(ray, obj_i, p_i);
     }
 
     /// Calcule l'illumination de l'objet \a obj au point \a p, sachant que l'observateur est le rayon \a ray.
