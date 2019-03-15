@@ -42,8 +42,9 @@ int main(int argc, char **argv)
     // dans main
     addBubble( scene, Point3( -5, 4, -1 ), 2.0, Material::glass() );
     addBubble( scene, Point3(0, 0, 0), 2.0, Material::bronze() );
-    addBubble( scene, Point3(0, 4, 0), 2.0, Material::emerald() );
-    addBubble( scene, Point3(6, 6, 0), 2.0, Material::whitePlastic() );
+    addBubble( scene, Point3(0, 4, 0), 1.0, Material::emerald() );
+    addBubble( scene, Point3(6, 6, 0), 3.0, Material::whitePlastic() );
+    addBubble( scene, Point3(6, 0, 6), 2.0, Material::redPlastic() );
 
     // Instantiate the viewer.
     Viewer viewer;
