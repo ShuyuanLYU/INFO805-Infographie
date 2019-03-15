@@ -315,7 +315,6 @@ struct Renderer
         Real r = m.in_refractive_index / m.out_refractive_index;
         Real c = -1.0 * N.dot(aRay.direction);
 
-        //When the ray is inside the object and go out
         if (aRay.direction.dot(N) <= 0)
             r = 1.0 / r;
 
@@ -326,7 +325,6 @@ struct Renderer
 
         Vector3 vRefrac = Vector3(r * aRay.direction + tmp * N);
 
-        //Total reflexion
         if (1 - ((r * r) * (1 - (c * c))) < 0)
             vRefrac = reflect(aRay.direction, N);
 
