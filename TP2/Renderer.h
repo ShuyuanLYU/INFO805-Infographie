@@ -257,23 +257,16 @@ struct Renderer
     /// transparents, attenue la couleur.
     Color shadow(const Ray &ray, Color lightColor)
     {
-        Point3 rayOrigin = ray.origin - ray.direction * 0.001f;
-
-        GraphicalObject *originObject = 0;
-        Point3 pointOfIntersection;
-
-        ptrScene->rayIntersection(Ray(rayOrigin, ray.direction, ray.depth), originObject, pointOfIntersection);
-
-        rayOrigin += ray.direction * 0.001f;
+        Point3 rayOrigin = ray.origin;
 
         while (lightColor.max() > 0.003f)
         {
             rayOrigin += ray.direction * 0.001f;
 
             GraphicalObject *intersectedObj = 0;
+            Point3 pointOfIntersection;
 
-            if (ptrScene->rayIntersection(Ray(rayOrigin, ray.direction, ray.depth), intersectedObj, pointOfIntersection) >= 0.0f 
-                || intersectedObj == originObject)
+            if (ptrScene->rayIntersection(Ray(rayOrigin, ray.direction, ray.depth), intersectedObj, pointOfIntersection) >= 0.0f)
                 break;
             else
             {
@@ -282,7 +275,6 @@ struct Renderer
                 lightColor = lightColor * material.diffuse * material.coef_refraction;
 
                 rayOrigin = pointOfIntersection;
-                originObject = intersectedObj;
             }
         }
 
