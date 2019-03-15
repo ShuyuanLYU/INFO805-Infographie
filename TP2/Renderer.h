@@ -187,7 +187,20 @@ struct Renderer
             color += color_refl * material.specular * material.coef_reflexion;
         }
 
-        return color + illumination(ray, obj_i, p_i);
+        if (ray.depth > 0 && material.coef_refraction != 0)
+        {
+            Ray ray_refrac = refractionRay(ray, p_i, obj_i->getNormal(p_i), material);
+            Color c_refrac = trace(ray_refrac);
+
+            color += c_refrac * material.diffuse * material.coef_refraction;
+        }
+
+        Color colorIllumination = illumination(ray, obj_i, p_i);
+
+        if (ray.depth != 0)
+            colorIllumination = colorIllumination * material.coef_diffusion;
+
+        return color + colorIllumination;
     }
 
     /// Calcule l'illumination de l'objet \a obj au point \a p, sachant que l'observateur est le rayon \a ray.
@@ -294,6 +307,30 @@ struct Renderer
         }
 
         return lightColor;
+    }
+
+    Ray refractionRay(const Ray &aRay, const Point3 &p, Vector3 N, const Material &m)
+    {
+        Real tmp;
+        Real r = m.in_refractive_index / m.out_refractive_index;
+        Real c = -1.0 * N.dot(aRay.direction);
+
+        //When the ray is inside the object and go out
+        if (aRay.direction.dot(N) <= 0)
+            r = 1.0 / r;
+
+        if (c > 0)
+            tmp = r * c - sqrt(1 - ((r * r) * (1 - (c * c))));
+        else
+            tmp = r * c + sqrt(1 - ((r * r) * (1 - (c * c))));
+
+        Vector3 vRefrac = Vector3(r * aRay.direction + tmp * N);
+
+        //Total reflexion
+        if (1 - ((r * r) * (1 - (c * c))) < 0)
+            vRefrac = reflect(aRay.direction, N);
+
+        return Ray(p + vRefrac * 0.01f, vRefrac, aRay.depth - 1);
     }
 };
 
