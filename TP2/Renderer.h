@@ -190,8 +190,9 @@ struct Renderer
             Vector3 lightDirection = (*it)->direction(p);
             Color lightColor = (*it)->color(p);
 
-            Ray pointToLightRay = Ray(p, lightDirection);
-            Color shadow = this->shadow(pointToLightRay, lightColor);
+            // Couleur de la lumière avec ombre
+            Ray pointToLightRay(p, lightDirection);
+            lightColor = this->shadow(pointToLightRay, lightColor);
 
             // Couleur diffuse
             double coeffD = lightDirection.dot(normal) / (lightDirection.norm() * normal.norm());
@@ -216,8 +217,6 @@ struct Renderer
 
                 result += coeffS * material.specular * lightColor;
             }
-
-            result = result * shadow;
         }
 
         // Couleur ambiante
@@ -245,6 +244,7 @@ struct Renderer
                 result += light->color(ray.origin) * a * a;
             }
         }
+
         if (ptrBackground != 0)
             result += ptrBackground->backgroundColor(ray);
         return result;
@@ -257,16 +257,23 @@ struct Renderer
     /// transparents, attenue la couleur.
     Color shadow(const Ray &ray, Color lightColor)
     {
-        Point3 rayOrigin = ray.origin;
+        Point3 rayOrigin = ray.origin - ray.direction * 0.001f;
 
-        while(lightColor.max() > 0.003f)
+        GraphicalObject *originObject = 0;
+        Point3 pointOfIntersection;
+
+        ptrScene->rayIntersection(Ray(rayOrigin, ray.direction, ray.depth), originObject, pointOfIntersection);
+
+        rayOrigin += ray.direction * 0.001f;
+
+        while (lightColor.max() > 0.003f)
         {
-            rayOrigin += ray.direction + 0.001f;
+            rayOrigin += ray.direction * 0.001f;
 
             GraphicalObject *intersectedObj = 0;
-            Point3 pointOfIntersection;
 
-            if(ptrScene->rayIntersection(Ray(rayOrigin, ray.direction, ray.depth), intersectedObj, pointOfIntersection) >= 0.0f )
+            if (ptrScene->rayIntersection(Ray(rayOrigin, ray.direction, ray.depth), intersectedObj, pointOfIntersection) >= 0.0f 
+                || intersectedObj == originObject)
                 break;
             else
             {
@@ -275,6 +282,7 @@ struct Renderer
                 lightColor = lightColor * material.diffuse * material.coef_refraction;
 
                 rayOrigin = pointOfIntersection;
+                originObject = intersectedObj;
             }
         }
 
