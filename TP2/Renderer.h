@@ -18,29 +18,50 @@ struct Background
     virtual Color backgroundColor(const Ray &ray) = 0;
 };
 
-struct MyBackground : public Background
+struct DawnBackground : public Background
 {
     Color backgroundColor(const Ray &ray)
     {
         if (ray.direction[2] < 0.0)
+            return Color(0.3, 0.3, 0.3);
+        else // Dawn color
+        //return ray.direction[2] * Color(0.0, 0.0, 0.0) + (1 - ray.direction[2]) * Color(0.45, 0.0, 0.0);
         {
-            Color result(0.0f, 0.0f, 0.0f);
-
-            Real x = -0.5f * ray.direction[0] / ray.direction[2];
-            Real y = -0.5f * ray.direction[1] / ray.direction[2];
-            Real d = sqrt(x * x + y * y);
-            Real t = std::min(d, 30.0f) / 30.0f;
-            x -= floor(x);
-            y -= floor(y);
-            if (((x >= 0.5f) && (y >= 0.5f)) || ((x < 0.5f) && (y < 0.5f)))
-                result += (1.0f - t) * Color(0.2f, 0.2f, 0.2f) + t * Color(1.0f, 1.0f, 1.0f);
+            Color res = Color(0.0, 0.0, 0.0);
+            if (ray.direction[2] < 0.01)
+            {
+                Real x = (ray.direction[2]) / 0.01;
+                res = (1 - x) * Color(0.20, 0.16, 0.18) + x * Color(0.4549, 0.164, 0.2235);
+            }
+            else if (ray.direction[2] < 0.03)
+            {
+                Real x = (ray.direction[2] - 0.01) / 0.02;
+                Real x_pi = sin(x * M_PI / 2);
+                res = (1 - x_pi) * Color(0.4549, 0.164, 0.2235) + x_pi * Color(0.8274, 0.1843, 0.2196);
+            }
+            else if (ray.direction[2] < 0.2)
+            {
+                Real x = (ray.direction[2] - 0.04) / 0.16;
+                Real x_pi = cos(x * M_PI / 2);
+                res = x_pi * Color(0.8274, 0.1843, 0.2196) + (1 - x_pi) * Color(0.745, 0.5647, 0.7058);
+            }
+            else if (ray.direction[2] < 0.4)
+            {
+                Real x = (ray.direction[2] - 0.2) / 0.2;
+                res = (1 - x) * Color(0.745, 0.5647, 0.7058) + x * Color(0.2745, 0.4705, 0.7450);
+            }
+            else if (ray.direction[2] < 0.7)
+            {
+                Real x = (ray.direction[2] - 0.4) / 0.3;
+                res = (1 - x) * Color(0.2745, 0.4705, 0.7450) + x * Color(0.03921, 0.2588, 0.6078);
+            }
             else
-                result += (1.0f - t) * Color(0.4f, 0.4f, 0.4f) + t * Color(1.0f, 1.0f, 1.0f);
+            {
+                res = Color(0.03921, 0.2588, 0.6078);
+            }
 
-            return result;
+            return res;
         }
-        else
-            return ray.direction[2] * Color(0.0, 0.0, 1.0) + (1 - ray.direction[2]) * Color(1.0, 1.0, 1.0);
     }
 };
 
@@ -83,7 +104,6 @@ inline void progressBar(std::ostream &output,
 /// This structure takes care of rendering a scene.
 struct Renderer
 {
-
     /// The scene to render
     Scene *ptrScene;
     /// The origin of the camera in space.
@@ -108,11 +128,11 @@ struct Renderer
 
     Renderer() : ptrScene(0)
     {
-        ptrBackground = new MyBackground();
+        ptrBackground = new DawnBackground();
     }
     Renderer(Scene &scene) : ptrScene(&scene)
     {
-        ptrBackground = new MyBackground();
+        ptrBackground = new DawnBackground();
     }
     void setScene(rt::Scene &aScene) { ptrScene = &aScene; }
 

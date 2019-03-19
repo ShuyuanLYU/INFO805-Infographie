@@ -95,7 +95,7 @@ rt::Sphere::rayIntersection(const Ray &ray, Point3 &p)
   Vector3 origineOrtho = origineCenter.dot(ray.direction) * ray.direction;
 
   float distance = distance2(origineCenter, origineOrtho);
-  
+
   if (distance > radius * radius)
     return 1.0f;
   else
@@ -107,7 +107,7 @@ rt::Sphere::rayIntersection(const Ray &ray, Point3 &p)
 
     float t1 = (-2 * ray.direction.dot(centerOrigin) - sqrt(discriminant)) / 2;
     float t2 = (-2 * ray.direction.dot(centerOrigin) + sqrt(discriminant)) / 2;
-    
+
     if (t1 > 0)
     {
       p = ray.origin + t1 * ray.direction;

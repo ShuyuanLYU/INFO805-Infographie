@@ -41,7 +41,7 @@ int main(int argc, char **argv)
   // dans main
 
   /* Artistic output */
-  /*//Whales
+  //Whales
   addBubble(scene, Point3(0, 0, -19), 20.0, Material::chrome());
   addBubble(scene, Point3(-10, 15, -5), 6.0, Material::chrome());
   addBubble(scene, Point3(-15, 30, -2), 3.0, Material::chrome());
@@ -49,27 +49,6 @@ int main(int argc, char **argv)
   //Whale 1 Eye
   addBubble(scene, Point3(-20, -1, 20), 1.5, Material::pupil());
   addBubble(scene, Point3(-20, -1, 20), 3, Material::glass());
-
-  */
-
-  /* Technical output */
-  addBubble(scene, Point3(14, 0, 5), 2.0, Material::emerald());
-  addBubble(scene, Point3(3, 3, -2), 7.0, Material::bronze());
-  addBubble(scene, Point3(12, 0, 10), 1.0, Material::glass());
-  addBubble(scene, Point3(10, -2, 5), 1.0, Material::whitePlastic());
-  addBubble(scene, Point3(8, 0, 8), 2.0, Material::redPlastic());
-
-  addBubble(scene, Point3(-5, -5, 5), 1.0, Material::glass());
-  addBubble(scene, Point3(-6, -5, 7), 1.0, Material::myRed());
-  addBubble(scene, Point3(-4.5, -5.5, 9), 1.0, Material::myJaune());
-  addBubble(scene, Point3(-4, -6, 11), 1.0, Material::myRuby());
-  addBubble(scene, Point3(-4.5, -4.5, 13), 1.0, Material::Myglass());
-  addBubble(scene, Point3(-5, -4, 15), 1.0, Material::myJade());
-  addBubble(scene, Point3(-4.5, -4.5, 17), 1.0, Material::myPearl());
-
-  addBubble(scene, Point3(15, 1, 10), 1.0, Material::glass());
-  addBubble(scene, Point3(18, 3, 14), 1.0, Material::glass());
-  addBubble(scene, Point3(13, 4, 17), 1.0, Material::glass());
 
   WaterPlane *waterPlane = new WaterPlane(Point3(0, 0, 0), Vector3(5, 0, 0), Vector3(0, 5, 0),
                                           Material::blueWater());

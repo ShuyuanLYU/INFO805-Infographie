@@ -81,22 +81,21 @@ struct Scene
     }
 
     /// returns the closest object intersected by the given ray.
-    Real
-    rayIntersection(const Ray &ray,
-                    GraphicalObject *&object, Point3 &p)
+    Real rayIntersection(const Ray &ray, GraphicalObject *&object, Point3 &p)
     {
         float distance = std::numeric_limits<float>::max();
 
         for (std::vector<GraphicalObject *>::const_iterator it = myObjects.begin(); it < myObjects.end(); ++it)
         {
-            Point3 newP;
+            Point3 intersectionPoint;
 
-            if((*it) -> rayIntersection(ray, newP) < 0.0f) {
-                float newDistance = (newP - ray.origin).dot(ray.direction);
+            if ((*it)->rayIntersection(ray, intersectionPoint) < 0.0f)
+            {
+                float newDistance = (intersectionPoint - ray.origin).dot(ray.direction);
                 if (newDistance < distance)
                 {
                     distance = newDistance;
-                    p = newP;
+                    p = intersectionPoint;
                     object = *it;
                 }
             }
