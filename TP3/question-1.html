@@ -18,6 +18,7 @@
         var camera = null;
         var cube = null;
         var sphere = null;
+        var lignt = null;
         var curTime = Date.now();
 
         // This function is called whenever the document is loaded
@@ -68,6 +69,13 @@
             // Finally, add the mesh to our scene
             // scene.add(cube);
             scene.add(sphere);
+
+            // Add a white point light
+            light = new THREE.PointLight(0xffffff, 1.5);
+            light.position.x = 5;
+            light.position.y = 5;
+            light.position.x = 5;
+            scene.add(light);
         }
 
         // This function is called regularly to update the canvas webgl.

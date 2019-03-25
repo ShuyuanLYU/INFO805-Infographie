@@ -49,5 +49,5 @@ Makefile
 # TP2
 
 *.ppm
-Images
+TP2/Images
 ray-tracer
