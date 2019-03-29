@@ -1,245 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <title>A small introduction to three.js webgl [1]</title>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
     <link rel="stylesheet" href="css/basic.css" />
 
     <script src="three.js"></script>
     <script src="js/Detector.js"></script>
     <script src="js/OrbitControls.js"></script>
     <script type="text/javascript">
-        // Checks that your browser supports WebGL.
-        if (!Detector.webgl) Detector.addGetWebGLMessage();
+      // Checks that your browser supports WebGL.
+      if (!Detector.webgl) Detector.addGetWebGLMessage();
 
-        var renderer = null;
-        var scene = null;
-        var camera = null;
-        var sun = null;
-        var earth = null;
-        var moon = null;
-        var sunGroup = null;
-        var earthGroup = null;
-        var curTime = Date.now();
-        var controls = null;
+      var renderer = null;
+      var scene = null;
+      var camera = null;
+      var sun = null;
+      var earth = null;
+      var moon = null;
+      var sunGroup = null;
+      var earthGroup = null;
+      var curTime = Date.now();
+      var controls = null;
 
-        // This function is called whenever the document is loaded
-        function init() {
-            // Get display canvas
-            var canvas = document.getElementById("webglcanvas");
-            console.log(canvas);
+      // This function is called whenever the document is loaded
+      function init() {
+        // Get display canvas
+        var canvas = document.getElementById("webglcanvas");
+        console.log(canvas);
 
-            // Create the Three.js renderer and attach it to our canvas
-            renderer = new THREE.WebGLRenderer({
-                canvas: canvas,
-                antialias: true
-            });
-            // Set the viewport size
-            renderer.setSize(canvas.width, canvas.height);
-            // Create a new Three.js scene
-            scene = new THREE.Scene();
-            // Add  a camera so we can view the scene
-            camera = new THREE.PerspectiveCamera(
-                45,
-                canvas.width / canvas.height,
-                1,
-                4000
-            );
-            // Create a texture-mapped cube and add it to the scene
-            // First, create the texture map
-            // var mapUrl = "images/webgl-logo-256.jpg";
-            var earthMapUrl = "images/earth_atmos_2048.jpg";
-            var earthMap = new THREE.TextureLoader().load(earthMapUrl);
+        // Create the Three.js renderer and attach it to our canvas
+        renderer = new THREE.WebGLRenderer({
+          canvas: canvas,
+          antialias: true,
+          alpha: true
+        });
+        // Set the viewport size
+        renderer.setSize(canvas.width, canvas.height);
+        // Create a new Three.js scene
+        scene = new THREE.Scene();
+        // Add  a camera so we can view the scene
+        camera = new THREE.PerspectiveCamera(
+          45,
+          canvas.width / canvas.height,
+          1,
+          4000
+        );
+        // Create a texture-mapped cube and add it to the scene
+        // First, create the texture map
+        // var mapUrl = "images/webgl-logo-256.jpg";
+        var sunMapUrl = "images/sun_atmos.jpg";
+        var sunMap = new THREE.TextureLoader().load(sunMapUrl);
 
-            var moonMapUrl = "images/moon_1024.jpg";
-            var moonMap = new THREE.TextureLoader().load(moonMapUrl);
+        var earthMapUrl = "images/earth_atmos_2048.jpg";
+        var earthMap = new THREE.TextureLoader().load(earthMapUrl);
 
-            // Now, create a Basic material; pass in the map
-            var sunMaterial = new THREE.MeshBasicMaterial({
-                color: 0xffff00
-            });
+        var moonMapUrl = "images/moon_1024.jpg";
+        var moonMap = new THREE.TextureLoader().load(moonMapUrl);
 
-            var earthMaterial = new THREE.MeshPhongMaterial({
-                map: earthMap
-            });
+        // Now, create a Basic material; pass in the map
+        var sunMaterial = new THREE.MeshBasicMaterial({
+          map: sunMap
+        });
 
-            var moonMaterial = new THREE.MeshPhongMaterial({
-                map: moonMap
-            });
+        var earthMaterial = new THREE.MeshPhongMaterial({
+          map: earthMap
+        });
 
-            // Create the cube geometry
-            var sunGeometry = new THREE.SphereGeometry(1, 32, 32);
-            var earthGeometry = new THREE.SphereGeometry(0.3, 32, 32);
-            var moonGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+        var moonMaterial = new THREE.MeshPhongMaterial({
+          map: moonMap
+        });
 
-            // And put the geometry and material together into a mesh
-            sun = new THREE.Mesh(sunGeometry, sunMaterial);
-            earth = new THREE.Mesh(earthGeometry, earthMaterial);
-            moon = new THREE.Mesh(moonGeometry, moonMaterial);
+        // Create the cube geometry
+        var sunGeometry = new THREE.SphereGeometry(1, 32, 32);
+        var earthGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+        var moonGeometry = new THREE.SphereGeometry(0.1, 32, 32);
 
-            earthGroup = new THREE.Group();
-            earthGroup.add(earth);
-            earthGroup.add(moon);
+        // And put the geometry and material together into a mesh
+        sun = new THREE.Mesh(sunGeometry, sunMaterial);
+        earth = new THREE.Mesh(earthGeometry, earthMaterial);
+        moon = new THREE.Mesh(moonGeometry, moonMaterial);
 
-            sunGroup = new THREE.Group();
-            sunGroup.add(sun);
-            sunGroup.add(earthGroup);
+        earthGroup = new THREE.Group();
+        earthGroup.add(earth);
+        earthGroup.add(moon);
 
-            sunGroup.position.x = 0;
-            sunGroup.position.y = 0;
-            sunGroup.position.z = 0;
-            earthGroup.position.x = 2;
-            earthGroup.position.y = 0;
-            earthGroup.rotation.x = Math.PI / 5;
-            earthGroup.rotation.y = Math.PI / 5;
-            moon.position.x = 0.5;
-            moon.position.y = 0;
+        sunGroup = new THREE.Group();
+        sunGroup.add(sun);
+        sunGroup.add(earthGroup);
 
-            earth.castShadow = true;
-            earth.receiveShadow = true;
-            moon.castShadow = true;
-            moon.receiveShadow = true;
+        sunGroup.position.x = 0;
+        sunGroup.position.y = 0;
+        sunGroup.position.z = 0;
+        earthGroup.position.x = 2;
+        earthGroup.position.y = 0;
+        earthGroup.rotation.x = Math.PI / 5;
+        earthGroup.rotation.y = Math.PI / 5;
+        moon.position.x = 0.5;
+        moon.position.y = 0;
 
-            // Finally, add the mesh to our scene
-            scene.add(sunGroup);
+        earth.castShadow = true;
+        earth.receiveShadow = true;
+        moon.castShadow = true;
+        moon.receiveShadow = true;
 
-            // Add a white point light
-            light = new THREE.PointLight(0xffffff, 3, 5000);
-            light.position.x = 0;
-            light.position.y = 0;
-            light.position.z = 0;
-            light.castShadow = true;
-            // On peut aussi paramétrer la qualité du calcul
-            light.shadow.mapSize.width = 512; // default
-            light.shadow.mapSize.height = 512; // default
-            light.shadow.camera.near = 0.5; // default
-            light.shadow.camera.far = 50;
-            scene.add(light);
+        // Finally, add the mesh to our scene
+        scene.add(sunGroup);
 
-            // Add background
-            var path = "images/MilkyWay/";
-            var format = ".jpg";
-            var urls = [
-                path + "posx" + format,
-                path + "negx" + format,
-                path + "posy" + format,
-                path + "negy" + format,
-                path + "posz" + format,
-                path + "negz" + format
-            ];
-            var textureCube = new THREE.CubeTextureLoader().load(urls);
-            textureCube.format = THREE.RGBFormat;
-            scene.background = textureCube;
+        // Add a white point light
+        light = new THREE.PointLight(0xffffff, 3, 5000);
+        light.position.x = 0;
+        light.position.y = 0;
+        light.position.z = 0;
+        light.castShadow = true;
+        // On peut aussi paramétrer la qualité du calcul
+        light.shadow.mapSize.width = 512; // default
+        light.shadow.mapSize.height = 512; // default
+        light.shadow.camera.near = 0.5; // default
+        light.shadow.camera.far = 50;
+        scene.add(light);
 
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            //controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
-            controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
-            controls.dampingFactor = 0.25;
-            controls.screenSpacePanning = false;
-            controls.minDistance = 1;
-            controls.maxDistance = 20;
+        // Add background
+        var path = "images/MilkyWay/";
+        var format = ".jpg";
+        var urls = [
+          path + "posx" + format,
+          path + "negx" + format,
+          path + "posy" + format,
+          path + "negy" + format,
+          path + "posz" + format,
+          path + "negz" + format
+        ];
+        var textureCube = new THREE.CubeTextureLoader().load(urls);
+        textureCube.format = THREE.RGBFormat;
+        scene.background = textureCube;
 
-            renderer.shadowMap.enabled = true;
-            // rendu coûteux mais plus joli (default: THREE.PCFShadowMap)
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        //controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
+        controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+        controls.dampingFactor = 0.25;
+        controls.screenSpacePanning = false;
+        controls.minDistance = 1;
+        controls.maxDistance = 20;
 
-            // world
+        renderer.shadowMap.enabled = true;
+        // rendu coûteux mais plus joli (default: THREE.PCFShadowMap)
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-            var colors = [
-                0xffb6c1,
-                0xFF69B4,
-                0x8A2BE2,
-                0x1E90FF,
-                0x00FFFF,
-                0x00FF7F,
-                0xFFFF00,
-                0xFFA500,
-                0xFF4500,
-                0xFF0000
-            ]
+        // world
 
-            var s = 15;
-            var geometry = new THREE.SphereGeometry(s, s, s);
+        var colors = [
+          0xffb6c1,
+          0xff69b4,
+          0x8a2be2,
+          0x1e90ff,
+          0x00ffff,
+          0x00ff7f,
+          0xffff00,
+          0xffa500,
+          0xff4500,
+          0xff0000
+        ];
 
-            for (var i = 0; i < 3000; i++) {
-                var material = new THREE.MeshPhongMaterial({
-                    color: colors[i % 10],
-                    specular: 0xffffff,
-                    shininess: 50
-                });
+        var s = 15;
+        var geometry = new THREE.SphereGeometry(s, s, s);
 
-                var star = new THREE.Mesh(geometry, material);
-                star.position.x = 8000 * (2.0 * Math.random() - 1.0);
-                star.position.y = 8000 * (2.0 * Math.random() - 1.0);
-                star.position.z = 8000 * (2.0 * Math.random() - 1.0);
-                star.rotation.x = Math.random() * Math.PI;
-                star.rotation.y = Math.random() * Math.PI;
-                star.rotation.z = Math.random() * Math.PI;
-                star.matrixAutoUpdate = false;
-                star.updateMatrix();
-                scene.add(star);
-            }
+        for (var i = 0; i < 3000; i++) {
+          var material = new THREE.MeshPhongMaterial({
+            color: colors[i % 10],
+            specular: 0xffffff,
+            shininess: 50
+          });
 
+          var star = new THREE.Mesh(geometry, material);
+          star.position.x = 8000 * (2.0 * Math.random() - 1.0);
+          star.position.y = 8000 * (2.0 * Math.random() - 1.0);
+          star.position.z = 8000 * (2.0 * Math.random() - 1.0);
+          star.rotation.x = Math.random() * Math.PI;
+          star.rotation.y = Math.random() * Math.PI;
+          star.rotation.z = Math.random() * Math.PI;
+          star.matrixAutoUpdate = false;
+          star.updateMatrix();
+          scene.add(star);
         }
+      }
 
-        // This function is called regularly to update the canvas webgl.
-        function run() {
-            // Ask to call again run
-            requestAnimationFrame(run);
+      // This function is called regularly to update the canvas webgl.
+      function run() {
+        // Ask to call again run
+        requestAnimationFrame(run);
 
-            // Render the scene
-            render();
+        // Render the scene
+        render();
 
-            // Calls the animate function if objects or camera should move
-            animate();
-        }
+        // Calls the animate function if objects or camera should move
+        animate();
+      }
 
-        // This function is called regularly to take care of the rendering.
-        function render() {
-            // Render the scene
-            renderer.render(scene, camera);
-        }
+      // This function is called regularly to take care of the rendering.
+      function render() {
+        // Render the scene
+        renderer.render(scene, camera);
+      }
 
-        // This function is called regularly to update objects.
-        function animate() {
-            // Computes how time has changed since last display
-            var now = Date.now();
-            var deltaTime = now - curTime;
-            curTime = now;
-            var fracTime = deltaTime / 1000; // in seconds
-            // Now we can move objects, camera, etc.
-            // Example: rotation cube
+      // This function is called regularly to update objects.
+      function animate() {
+        // Computes how time has changed since last display
+        var now = Date.now();
+        var deltaTime = now - curTime;
+        curTime = now;
+        var fracTime = deltaTime / 1000; // in seconds
+        // Now we can move objects, camera, etc.
+        // Example: rotation cube
 
-            var angle = fracTime * Math.PI * 2;
-            // Notez que l'axe y est l'axe "vertical" usuellement.
-            sunGroup.rotation.y += angle / 20; // la terre tourne en 365 jours
-            earth.rotation.y += angle; // et en un jour sur elle-même
-            earthGroup.rotation.y += angle / 28; // la lune tourne en 28 jours autour de la terre
-            moon.rotation.y += angle / 28; // et en 28 jours aussi sur elle-même pour faire face à la terre
+        var angle = fracTime * Math.PI * 2;
+        // Notez que l'axe y est l'axe "vertical" usuellement.
+        sunGroup.rotation.y += angle / 365; // la terre tourne en 365 jours
+        sun.rotation.y += angle / 500;
+        earth.rotation.y += angle; // et en un jour sur elle-même
+        earthGroup.rotation.y += angle / 28; // la lune tourne en 28 jours autour de la terre
+        moon.rotation.y += angle / 28; // et en 28 jours aussi sur elle-même pour faire face à la terre
 
-            camera.lookAt(earth.matrixWorld.getPosition());
-            var cameraAngle = 20;
+        camera.lookAt(earth.matrixWorld.getPosition());
+        var cameraAngle = 20;
 
-            // Avec un grand demi-axe de 5 et un petit demi-axe de 3
-            camera.position.x = 5 * Math.cos(cameraAngle);
-            camera.position.y = 3 * Math.sin(cameraAngle);
+        // Avec un grand demi-axe de 5 et un petit demi-axe de 3
+        camera.position.x = 5 * Math.cos(cameraAngle);
+        camera.position.y = 3 * Math.sin(cameraAngle);
 
-            controls.update();
-        }
+        controls.update();
+      }
     </script>
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="info">a first three.js example</div>
-    <canvas id="webglcanvas" style="border: none;background-color:#000000" width="1200" height="600"></canvas>
+    <canvas
+      id="webglcanvas"
+      style="border: none;background-color:#000000"
+      width="1200"
+      height="600"
+    ></canvas>
     <!-- We run the WebGL code at the end to be sure that the document is loaded.
       -->
     <script>
-        init();
-        run();
+      init();
+      run();
     </script>
-</body>
-
+  </body>
 </html>
