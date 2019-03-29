@@ -106,7 +106,7 @@
             scene.add(sunGroup);
 
             // Add a white point light
-            light = new THREE.PointLight(0xffffff, 1.5);
+            light = new THREE.PointLight(0xffffff, 3, 5000);
             light.position.x = 0;
             light.position.y = 0;
             light.position.z = 0;
@@ -144,6 +144,44 @@
             renderer.shadowMap.enabled = true;
             // rendu coûteux mais plus joli (default: THREE.PCFShadowMap)
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+            // world
+
+            var colors = [
+                0xffb6c1,
+                0xFF69B4,
+                0x8A2BE2,
+                0x1E90FF,
+                0x00FFFF,
+                0x00FF7F,
+                0xFFFF00,
+                0xFFA500,
+                0xFF4500,
+                0xFF0000
+            ]
+
+            var s = 15;
+            var geometry = new THREE.SphereGeometry(s, s, s);
+
+            for (var i = 0; i < 3000; i++) {
+                var material = new THREE.MeshPhongMaterial({
+                    color: colors[i % 10],
+                    specular: 0xffffff,
+                    shininess: 50
+                });
+
+                var star = new THREE.Mesh(geometry, material);
+                star.position.x = 8000 * (2.0 * Math.random() - 1.0);
+                star.position.y = 8000 * (2.0 * Math.random() - 1.0);
+                star.position.z = 8000 * (2.0 * Math.random() - 1.0);
+                star.rotation.x = Math.random() * Math.PI;
+                star.rotation.y = Math.random() * Math.PI;
+                star.rotation.z = Math.random() * Math.PI;
+                star.matrixAutoUpdate = false;
+                star.updateMatrix();
+                scene.add(star);
+            }
+
         }
 
         // This function is called regularly to update the canvas webgl.
